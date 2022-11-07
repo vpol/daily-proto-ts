@@ -32,16 +32,20 @@ export function errorTypeToJSON(object: ErrorType): string {
 
 export interface Error {
   type: ErrorType;
+  value: string;
 }
 
 function createBaseError(): Error {
-  return { type: 0 };
+  return { type: 0, value: "" };
 }
 
 export const Error = {
   encode(message: Error, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
     }
     return writer;
   },
@@ -56,6 +60,9 @@ export const Error = {
         case 1:
           message.type = reader.int32() as any;
           break;
+        case 2:
+          message.value = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -67,18 +74,21 @@ export const Error = {
   fromJSON(object: any): Error {
     return {
       type: isSet(object.type) ? errorTypeFromJSON(object.type) : 0,
+      value: isSet(object.value) ? String(object.value) : "",
     };
   },
 
   toJSON(message: Error): unknown {
     const obj: any = {};
     message.type !== undefined && (obj.type = errorTypeToJSON(message.type));
+    message.value !== undefined && (obj.value = message.value);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<Error>, I>>(object: I): Error {
     const message = createBaseError();
     message.type = object.type ?? 0;
+    message.value = object.value ?? "";
     return message;
   },
 };
